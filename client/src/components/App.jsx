@@ -12,7 +12,8 @@ class App extends React.Component {
       countdown: 3,
       time: null,
       showButtons: true,
-      workoutLengthInMins: 15
+      workoutLengthInMins: 15,
+      elapsedTime: null
     };
 
     this.goToWorkout = this.goToWorkout.bind(this);
@@ -228,8 +229,9 @@ class App extends React.Component {
 
   timer() {
     var current = this.state.time;
+    var elapsedTime = 900 - current;
     current--;
-    this.setState({time: current});
+    this.setState({time: current, elapsedTime: elapsedTime});
     if (this.state.time <= 0) {
       this.goToSummary();
     } else if (this.state.time % 60 === 0) {
@@ -249,6 +251,15 @@ class App extends React.Component {
     return mm + ':' + ss;
   }
 
+  formatSummaryTime(seconds) {
+    var mm = Math.floor(seconds / 60);
+    var ss = seconds % 60;
+    if (ss < 10) {
+      ss = '0' + ss;
+    }
+    return mm + ' minutes' + ' : ' + ss + ' seconds';
+  }
+
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * *
   Renders the components based ot the current state
@@ -257,7 +268,10 @@ class App extends React.Component {
   render() {
     var toBeRendered = () => {
       if (this.state.currentState === 'Dashboard') {
-        return (<Dashboard goToCountdown={this.goToCountdown} workoutHistory={this.state.workoutHistory} loggedIn={this.state.loggedIn} />);
+        return (<Dashboard
+          goToCountdown={this.goToCountdown}
+          workoutHistory={this.state.workoutHistory}
+          loggedIn={this.state.loggedIn} />);
       }
       if (this.state.currentState === 'Login') {
           return (<Login login={this.login} />);
@@ -272,7 +286,7 @@ class App extends React.Component {
         return (<Workout exercise={this.state.currentWorkout[this.state.currentExercise]} timer={this.formatTime(this.state.time)} countdown={this.state.countdown} goToSummary={this.goToSummary} goToDashboard={this.goToDashboard} ref="workoutPage" />);
       }
       if (this.state.currentState === 'Summary') {
-        return (<Summary goToDashboard={this.goToDashboard} currentWorkout={this.state.currentWorkout} workoutDate={this.state.workoutDate} workoutLengthInMins={this.state.workoutLengthInMins} loggedIn={this.state.loggedIn} />);
+        return (<Summary goToDashboard={this.goToDashboard} currentWorkout={this.state.currentWorkout} workoutDate={this.state.workoutDate} workoutLengthInMins={this.state.workoutLengthInMins} loggedIn={this.state.loggedIn} elapsedTime={this.state.elapsedTime} formatTime={this.formatSummaryTime}/>);
       }
     }
 
